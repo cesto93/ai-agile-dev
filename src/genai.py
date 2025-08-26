@@ -108,7 +108,8 @@ class UserStory(BaseModel):
 
 
 class State(TypedDict):
-    problemDoc: str
+    problem_text: str
+    stories_name: list[str]
     stories: list[UserStory]
     llm: BaseChatModel
 
@@ -125,8 +126,7 @@ def create_agent():
     """
 
     graph_builder = StateGraph(State)
-    graph_builder.add_node("paraphrase_text", paraphrase_text)
-    graph_builder.add_node("extract_metadata", extract_metadata)
+    graph_builder.add_node("get_stories", get_stories)
     graph_builder.add_node("save_note_action", save_stories_action)
 
     graph_builder.add_edge(START, "paraphrase_text")
@@ -152,47 +152,53 @@ def get_initial_state(provider: str, model: str, doc_path: str) -> State:
     """
     llm = init_chat_model(f"{provider}:{model}")
     with open(doc_path, "r", encoding="utf-8") as f:
-        problem_doc = f.read()
+        problem_text = f.read()
     return {
-        "problemDoc": problem_doc,
+        "problem_text": problem_text,
+        "stories_name": [],
         "stories": [],
         "llm": llm,
     }
 
 
-def extract_metadata(state: State):
+def get_stories(state: State):
     """
-    Extracts metadata from the given text using the provided language model.
+    Analyzes the problem description and extracts a list of user story names.
 
     Args:
-        llm (ChatGoogleGenerativeAI): The language model to use for metadata extraction.
-        text (str): The text from which to extract metadata.
+        state (State): The current state containing the problem description and LLM.
 
     Returns:
-        NoteMetadata: An instance containing the extracted metadata.
+        dict: Updated state with 'stories_name' as a list of story titles.
     """
-    text = state["note"]
+    problem_desc = state["problem_text"]
     prompt_template = ChatPromptTemplate.from_messages(
         [
             (
                 "system",
-                "You are an expert extraction algorithm. "
-                "Only extract relevant information from the text. "
-                "If you do not know the value of an attribute asked to extract, "
-                "return null for the attribute's value.",
+                "You are an expert agile analyst. "
+                "Given the following problem description, extract a list of possible user stories. "
+                "Return ONLY a Python list of short user story titles (as strings), nothing else.",
             ),
-            ("human", "{text}"),
+            ("human", "{problem_desc}"),
         ]
     )
 
     llm = state["llm"]
-    structured_llm = llm.with_structured_output(schema=NoteMetadata)
-    prompt = prompt_template.invoke({"text": text})
-    result = structured_llm.invoke(prompt)
-    if isinstance(result, NoteMetadata):
-        return {"metadata": result}
-    else:
-        raise ValueError("The result is not of type NoteMetadata.")
+    prompt = prompt_template.invoke({"problem_desc": problem_desc})
+    # We expect the LLM to return a Python list of strings
+    result = llm.invoke(prompt)
+    # Try to safely evaluate the result as a Python list
+    import ast
+
+    try:
+        stories_name = ast.literal_eval(result)
+        if not isinstance(stories_name, list):
+            raise ValueError
+    except Exception:
+        raise ValueError("LLM did not return a valid list of user story names.")
+
+    return {**state, "stories_name": stories_name}
 
 
 def save_stories_action(state: State):
