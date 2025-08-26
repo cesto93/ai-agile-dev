@@ -2,11 +2,11 @@ from typing import List
 import os
 from tinydb import TinyDB, Query
 
-DB_FILE = "notes_db.json"
-NOTES_DIR = "notes"
+DB_FILE = "stories_db.json"
+STORIES_DIR = "stories"
 
 
-def save_note(note: str, title: str, tags: List[str]) -> None:
+def save_note(note: str, title: str, text: str) -> None:
     """
     Saves a note with the given content, argument, and tags.
 
@@ -16,7 +16,7 @@ def save_note(note: str, title: str, tags: List[str]) -> None:
         tags (List[str]): A list of tags associated with the note.
     """
     # Ensure notes directory exists
-    notes_dir = os.path.join(os.path.dirname(__file__), "..", NOTES_DIR)
+    notes_dir = os.path.join(os.path.dirname(__file__), "..", STORIES_DIR)
     os.makedirs(notes_dir, exist_ok=True)
 
     # Save note as markdown file
@@ -28,4 +28,4 @@ def save_note(note: str, title: str, tags: List[str]) -> None:
     # Save metadata to TinyDB
     db_path = os.path.join(os.path.dirname(__file__), "..", DB_FILE)
     db = TinyDB(db_path)
-    db.insert({"argument": title, "tags": tags})
+    db.insert({"title": title})

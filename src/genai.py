@@ -127,7 +127,7 @@ def create_agent():
     graph_builder = StateGraph(State)
     graph_builder.add_node("paraphrase_text", paraphrase_text)
     graph_builder.add_node("extract_metadata", extract_metadata)
-    graph_builder.add_node("save_note_action", save_note_action)
+    graph_builder.add_node("save_note_action", save_stories_action)
 
     graph_builder.add_edge(START, "paraphrase_text")
     graph_builder.add_edge("paraphrase_text", "extract_metadata")
@@ -138,7 +138,7 @@ def create_agent():
     return graph
 
 
-def get_initial_state(provider: str, model: str, docPath: str) -> State:
+def get_initial_state(provider: str, model: str, doc_path: str) -> State:
     """
     Returns the initial state for the agent.
 
@@ -151,10 +151,10 @@ def get_initial_state(provider: str, model: str, docPath: str) -> State:
         State: The initial state containing the document and llm.
     """
     llm = init_chat_model(f"{provider}:{model}")
-    with open(docPath, "r", encoding="utf-8") as f:
-        problemDoc = f.read()
+    with open(doc_path, "r", encoding="utf-8") as f:
+        problem_doc = f.read()
     return {
-        "problemDoc": problemDoc,
+        "problemDoc": problem_doc,
         "stories": [],
         "llm": llm,
     }
@@ -195,7 +195,7 @@ def extract_metadata(state: State):
         raise ValueError("The result is not of type NoteMetadata.")
 
 
-def save_note_action(state: State):
+def save_stories_action(state: State):
     """
     Saves the note and its metadata to the storage.
 
