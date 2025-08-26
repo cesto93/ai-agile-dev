@@ -4,7 +4,7 @@ from langchain_core.prompts import ChatPromptTemplate
 from langchain_core.language_models.chat_models import BaseChatModel
 from langchain.chat_models import init_chat_model
 from langgraph.graph import StateGraph, START, END
-from src.storage import save_note
+from src.storage import save_note, save_story
 import os
 
 USER_STORY_TEMPLATE = (
@@ -203,6 +203,6 @@ def save_stories_action(state: State):
         state (State): The state containing the note and metadata.
     """
 
-    note = state["note"]
-    metadata = state["metadata"]
-    save_note(note, metadata.Title, metadata.Tags)
+    stories = state["stories"]
+    for story in stories:
+        save_story(story)
