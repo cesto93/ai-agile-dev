@@ -38,6 +38,72 @@ class UserStory(BaseModel):
         ...,
         description="The title of the user story.",
     )
+    Description: str = Field(
+        ...,
+        description="A brief description of the functionality.",
+    )
+    Role: str = Field(
+        ...,
+        description="The user role (e.g., 'utente', 'admin').",
+    )
+    Feature: str = Field(
+        ...,
+        description="The feature the user wants.",
+    )
+    Benefit: str = Field(
+        ...,
+        description="The benefit the user gets.",
+    )
+    AcceptanceCriteria: str = Field(
+        ...,
+        description="Acceptance criteria for the user story.",
+    )
+    Constraints: str = Field(
+        default="",
+        description="Technological constraints.",
+    )
+    Performance: str = Field(
+        default="",
+        description="Performance requirements.",
+    )
+    Security: str = Field(
+        default="",
+        description="Security requirements.",
+    )
+    Dependencies: str = Field(
+        default="",
+        description="Dependencies.",
+    )
+    Priority: str = Field(
+        default="",
+        description="Priority.",
+    )
+    Estimate: str = Field(
+        default="",
+        description="Estimate.",
+    )
+    Attachments: str = Field(
+        default="",
+        description="Attachments or mockups.",
+    )
+
+    def to_template_string(self) -> str:
+        """Return the user story as a formatted string using the template."""
+        return USER_STORY_TEMPLATE.format(
+            title=self.Title,
+            description=self.Description,
+            role=self.Role,
+            feature=self.Feature,
+            benefit=self.Benefit,
+            acceptance_criteria=self.AcceptanceCriteria,
+            constraints=self.Constraints,
+            performance=self.Performance,
+            security=self.Security,
+            dependencies=self.Dependencies,
+            priority=self.Priority,
+            estimate=self.Estimate,
+            attachments=self.Attachments,
+        )
 
 
 class State(TypedDict):
