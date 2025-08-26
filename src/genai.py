@@ -32,6 +32,15 @@ USER_STORY_TEMPLATE = (
 )
 
 
+class UserStoriesList(BaseModel):
+    """The list of agile user story names"""
+
+    Names: list[str] = Field(
+        ...,
+        description="The list of user story names extracted from the problem description.",
+    )
+
+
 class UserStory(BaseModel):
     """The agile user story data"""
 
@@ -185,20 +194,12 @@ def get_stories(state: State):
     )
 
     llm = state["llm"]
+    structured_llm = llm.with_structured_output(UserStoriesList)
     prompt = prompt_template.invoke({"problem_desc": problem_desc})
     # We expect the LLM to return a Python list of strings
-    result = llm.invoke(prompt)
-    # Try to safely evaluate the result as a Python list
-    import ast
+    result = structured_llm.invoke(prompt)
 
-    try:
-        stories_name = ast.literal_eval(result)
-        if not isinstance(stories_name, list):
-            raise ValueError
-    except Exception:
-        raise ValueError("LLM did not return a valid list of user story names.")
-
-    return {**state, "stories_name": stories_name}
+    return {**state, "stories_name": result.Names}
 
 
 def save_stories_action(state: State):
