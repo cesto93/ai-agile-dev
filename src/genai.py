@@ -5,6 +5,7 @@ from langchain_core.language_models.chat_models import BaseChatModel
 from langchain.chat_models import init_chat_model
 from langgraph.graph import StateGraph, START, END
 from src.storage import save_note
+import os
 
 USER_STORY_TEMPLATE = (
     "Titolo:\n"
@@ -107,10 +108,9 @@ class UserStory(BaseModel):
 
 
 class State(TypedDict):
-    note: str
-    metadata: NoteMetadata
+    problemDoc: str
+    stories: list[UserStory]
     llm: BaseChatModel
-    action: str
 
 
 def create_agent():
@@ -125,7 +125,6 @@ def create_agent():
     """
 
     graph_builder = StateGraph(State)
-    graph_builder.add_node("summarize_text", summarize_text)
     graph_builder.add_node("paraphrase_text", paraphrase_text)
     graph_builder.add_node("extract_metadata", extract_metadata)
     graph_builder.add_node("save_note_action", save_note_action)
@@ -139,19 +138,25 @@ def create_agent():
     return graph
 
 
-def get_initial_state(model: str, note: str, action: str) -> State:
+def get_initial_state(provider: str, model: str, docPath: str) -> State:
     """
     Returns the initial state for the agent.
 
+    Args:
+        provider (str): The provider for the language model.
+        model (str): The model to use.
+        docPath (str): The path to the document to read.
+
     Returns:
-        State: The initial state containing default values.
+        State: The initial state containing the document and llm.
     """
-    llm = init_chat_model(f"google_genai:{model}")
+    llm = init_chat_model(f"{provider}:{model}")
+    with open(docPath, "r", encoding="utf-8") as f:
+        problemDoc = f.read()
     return {
-        "note": note,
-        "metadata": NoteMetadata(Title="", Tags=[]),
+        "problemDoc": problemDoc,
+        "stories": [],
         "llm": llm,
-        "action": action,
     }
 
 
