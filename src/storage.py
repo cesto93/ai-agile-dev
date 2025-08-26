@@ -6,26 +6,24 @@ DB_FILE = "stories_db.json"
 STORIES_DIR = "stories"
 
 
-def save_note(note: str, title: str, text: str) -> None:
+def save_story(story) -> None:
     """
-    Saves a note with the given content, argument, and tags.
+    Saves a user story as a markdown file and stores its metadata.
 
     Args:
-        note (str): The content of the note.
-        title (str): The note title.
-        tags (List[str]): A list of tags associated with the note.
+        story (UserStory): The user story object.
     """
-    # Ensure notes directory exists
-    notes_dir = os.path.join(os.path.dirname(__file__), "..", STORIES_DIR)
-    os.makedirs(notes_dir, exist_ok=True)
+    # Ensure stories directory exists
+    stories_dir = os.path.join(os.path.dirname(__file__), "..", STORIES_DIR)
+    os.makedirs(stories_dir, exist_ok=True)
 
-    # Save note as markdown file
-    filename = f"{title.replace(' ', '_')}.md"
-    filepath = os.path.join(notes_dir, filename)
+    # Save story as markdown file
+    filename = f"{story.Title.replace(' ', '_')}.md"
+    filepath = os.path.join(stories_dir, filename)
     with open(filepath, "w", encoding="utf-8") as f:
-        f.write(note)
+        f.write(story.to_template_string())
 
     # Save metadata to TinyDB
     db_path = os.path.join(os.path.dirname(__file__), "..", DB_FILE)
     db = TinyDB(db_path)
-    db.insert({"title": title})
+    db.insert({"title": story.Title, "file": filename})
