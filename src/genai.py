@@ -4,7 +4,7 @@ from langchain_core.prompts import ChatPromptTemplate
 from langchain_core.language_models.chat_models import BaseChatModel
 from langchain.chat_models import init_chat_model
 from langgraph.graph import StateGraph, START, END
-from src.storage import save_story
+from storage import save_story
 
 USER_STORY_TEMPLATE = (
     "Titolo:\n"
