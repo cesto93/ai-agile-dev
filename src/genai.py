@@ -4,8 +4,7 @@ from langchain_core.prompts import ChatPromptTemplate
 from langchain_core.language_models.chat_models import BaseChatModel
 from langchain.chat_models import init_chat_model
 from langgraph.graph import StateGraph, START, END
-from src.storage import save_note, save_story
-import os
+from src.storage import save_story
 
 USER_STORY_TEMPLATE = (
     "Titolo:\n"
@@ -136,12 +135,11 @@ def create_agent():
 
     graph_builder = StateGraph(State)
     graph_builder.add_node("get_stories", get_stories)
-    graph_builder.add_node("save_note_action", save_stories_action)
+    # graph_builder.add_node("save_stories_action", save_stories_action)
 
-    graph_builder.add_edge(START, "paraphrase_text")
-    graph_builder.add_edge("paraphrase_text", "extract_metadata")
-    graph_builder.add_edge("extract_metadata", "save_note_action")
-    graph_builder.add_edge("save_note_action", END)
+    graph_builder.add_edge(START, "get_stories")
+    # graph_builder.add_edge("get_stories", "save_note_action")
+    graph_builder.add_edge("get_stories", END)
     graph = graph_builder.compile()
 
     return graph
@@ -198,6 +196,7 @@ def get_stories(state: State):
     prompt = prompt_template.invoke({"problem_desc": problem_desc})
     # We expect the LLM to return a Python list of strings
     result = structured_llm.invoke(prompt)
+    print(f"Extracted user stories: {result.Names}")
 
     return {**state, "stories_name": result.Names}
 
