@@ -6,43 +6,29 @@ from langchain.chat_models import init_chat_model
 from langgraph.graph import StateGraph, START, END
 from src.storage import save_note
 
-USER_STORY_TEMPLATE = """
-Titolo:
-
-[Breve descrizione della funzionalità]
-
-User Story:
-
-Come [ruolo/utente]
-voglio [funzionalità/azione]
-in modo da [beneficio/valore atteso]
-
-Criteri di accettazione (Acceptance Criteria):
-[Condizione 1 da soddisfare]
-[Condizione 2 da soddisfare]
-
-Note tecniche (facoltative):
-
-Vincoli tecnologici: [es. deve funzionare su mobile e desktop]
-
-Performance: [es. risposta < 2s]
-
-Sicurezza: [es. cifratura password con algoritmo bcrypt]
-
-Dipendenze: [es. richiede autenticazione già implementata]
-
-Priorità:
-
-[Alta / Media / Bassa]
-
-Stima:
-
-[Story Points o giorni]
-
-Allegati / Mockup:
-
-[link a wireframe, diagramma, documento di supporto]
-"""
+USER_STORY_TEMPLATE = (
+    "Titolo:\n"
+    "{title}\n\n"
+    "[Breve descrizione della funzionalità]\n"
+    "{description}\n\n"
+    "User Story:\n\n"
+    "Come {role}\n"
+    "voglio {feature}\n"
+    "in modo da {benefit}\n\n"
+    "Criteri di accettazione (Acceptance Criteria):\n"
+    "{acceptance_criteria}\n\n"
+    "Note tecniche (facoltative):\n\n"
+    "Vincoli tecnologici: {constraints}\n\n"
+    "Performance: {performance}\n\n"
+    "Sicurezza: {security}\n\n"
+    "Dipendenze: {dependencies}\n\n"
+    "Priorità:\n\n"
+    "{priority}\n\n"
+    "Stima:\n\n"
+    "{estimate}\n\n"
+    "Allegati / Mockup:\n\n"
+    "{attachments}\n"
+)
 
 
 class UserStory(BaseModel):
