@@ -3,7 +3,6 @@ from pydantic import BaseModel, Field
 from langchain_core.prompts import ChatPromptTemplate
 from langchain_core.language_models.chat_models import BaseChatModel
 from langchain.chat_models import init_chat_model
-from langgraph.graph import StateGraph, START, END
 from storage import save_story
 
 USER_STORY_TEMPLATE = (
@@ -31,12 +30,25 @@ USER_STORY_TEMPLATE = (
 )
 
 
-class UserStoriesList(BaseModel):
-    """The list of agile user story names"""
+class UserStoryMinimal(BaseModel):
+    """The agile user story simple data"""
 
-    Names: list[str] = Field(
+    Title: str = Field(
         ...,
-        description="The list of user story names extracted from the problem description.",
+        description="The title of the user story.",
+    )
+    Description: str = Field(
+        ...,
+        description="A brief description of the functionality.",
+    )
+
+
+class UserStoriesMinimal(BaseModel):
+    """The agile user stories simple data"""
+
+    Stories: list[UserStoryMinimal] = Field(
+        ...,
+        description="A list of user stories with Title and Description.",
     )
 
 
@@ -117,32 +129,9 @@ class UserStory(BaseModel):
 
 class State(TypedDict):
     problem_text: str
-    stories_name: list[str]
+    stories_minimal: list[UserStoryMinimal]
     stories: list[UserStory]
     llm: BaseChatModel
-
-
-def create_agent():
-    """
-    Creates a Google Generative AI agent with the specified model.
-
-    Args:
-        model (str): The model to use for the agent.
-
-    Returns:
-        ChatGoogleGenerativeAI: An instance of the Google Generative AI agent.
-    """
-
-    graph_builder = StateGraph(State)
-    graph_builder.add_node("get_stories", get_stories)
-    # graph_builder.add_node("save_stories_action", save_stories_action)
-
-    graph_builder.add_edge(START, "get_stories")
-    # graph_builder.add_edge("get_stories", "save_note_action")
-    graph_builder.add_edge("get_stories", END)
-    graph = graph_builder.compile()
-
-    return graph
 
 
 def get_initial_state(provider: str, model: str, doc_path: str) -> State:
@@ -162,13 +151,13 @@ def get_initial_state(provider: str, model: str, doc_path: str) -> State:
         problem_text = f.read()
     return {
         "problem_text": problem_text,
-        "stories_name": [],
+        "stories_minimal": [],
         "stories": [],
         "llm": llm,
     }
 
 
-def get_stories(state: State):
+def get_stories_minimal(state: State) -> State:
     """
     Analyzes the problem description and extracts a list of user story names.
 
@@ -192,13 +181,18 @@ def get_stories(state: State):
     )
 
     llm = state["llm"]
-    structured_llm = llm.with_structured_output(UserStoriesList)
+    structured_llm = llm.with_structured_output(UserStoriesMinimal)
     prompt = prompt_template.invoke({"problem_desc": problem_desc})
     # We expect the LLM to return a Python list of strings
     result = structured_llm.invoke(prompt)
-    print(f"Extracted user stories: {result.Names}")
+    state["stories_minimal"] = result.Stories
 
-    return {**state, "stories_name": result.Names}
+    for story in state["stories_minimal"]:
+        print(story.Title)
+        print(story.Description)
+        print("-----")
+
+    return state
 
 
 def save_stories_action(state: State):

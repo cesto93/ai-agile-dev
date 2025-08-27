@@ -1,6 +1,6 @@
 import argparse
 from config import load_config
-from genai import create_agent, get_initial_state
+from genai import get_initial_state, get_stories_minimal
 
 
 def main():
@@ -17,13 +17,8 @@ def main():
     args = parser.parse_args()
 
     load_config()
-    agent = create_agent()
-    initial_state = get_initial_state(args.provider, args.model, args.doc_path)
-    result = agent.invoke(initial_state)
-
-    print("Generated User Stories:")
-    for story in result["stories"]:
-        print(story.to_template_string())
+    state = get_initial_state(args.provider, args.model, args.doc_path)
+    state = get_stories_minimal(state)
 
 
 if __name__ == "__main__":
