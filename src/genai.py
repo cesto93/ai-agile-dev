@@ -195,6 +195,59 @@ def get_stories_minimal(state: State) -> State:
     return state
 
 
+def refine_stories(state: State) -> State:
+    """
+    Refines each user story by adding detailed information.
+
+    Args:
+        state (State): The current state containing minimal user stories and LLM.
+
+    Returns:
+        State: Updated state with detailed user stories.
+    """
+    llm = state["llm"]
+    structured_llm = llm.with_structured_output(UserStory)
+
+    detailed_stories = []
+    for story in state["stories_minimal"]:
+        prompt_template = ChatPromptTemplate.from_messages(
+            [
+                (
+                    "system",
+                    "You are an expert agile analyst. "
+                    "Given the following user story title and description, "
+                    "provide a detailed user story with all fields filled out. "
+                    "Return the result as a JSON object matching the UserStory schema.",
+                ),
+                (
+                    "human",
+                    "User Story Title: {title}\n\n"
+                    "Description: {description}\n\n"
+                    "Provide the following fields:\n"
+                    "- Role\n"
+                    "- Feature\n"
+                    "- Benefit\n"
+                    "- Acceptance Criteria\n"
+                    "- Constraints\n"
+                    "- Performance\n"
+                    "- Security\n"
+                    "- Dependencies\n"
+                    "- Priority\n"
+                    "- Estimate\n"
+                    "- Attachments",
+                ),
+            ]
+        )
+        prompt = prompt_template.invoke(
+            {"title": story.Title, "description": story.Description}
+        )
+        detailed_story = structured_llm.invoke(prompt)
+        detailed_stories.append(detailed_story)
+
+    state["stories"] = detailed_stories
+    return state
+
+
 def save_stories_action(state: State):
     """
     Saves the note and its metadata to the storage.
