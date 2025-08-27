@@ -1,6 +1,6 @@
 import argparse
 from config import load_config
-from genai import get_initial_state, get_stories_minimal
+from agent import create_stories
 
 
 def main():
@@ -14,11 +14,15 @@ def main():
     parser.add_argument(
         "--doc_path", required=True, help="Path to the documentation file"
     )
+    parser.add_argument(
+        "--minimal",
+        action="store_true",
+        help="Only extract minimal user story names without details",
+    )
     args = parser.parse_args()
 
     load_config()
-    state = get_initial_state(args.provider, args.model, args.doc_path)
-    state = get_stories_minimal(state)
+    create_stories(args.provider, args.model, args.doc_path, args.minimal)
 
 
 if __name__ == "__main__":
