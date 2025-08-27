@@ -17,10 +17,16 @@ def main():
         "create", help="Create user stories from documentation"
     )
     create_parser.add_argument(
-        "--provider", required=True, help="Provider name (e.g., openai, azure)"
+        "--provider",
+        required=True,
+        help="Provider name (e.g., openai, azure)",
+        default="google_genai",
     )
     create_parser.add_argument(
-        "--model", required=True, help="Model name (e.g., gpt-4, llama2)"
+        "--model",
+        required=True,
+        help="Model name (e.g., gpt-4, llama2)",
+        default="gemini-2.5-flash",
     )
     create_parser.add_argument(
         "--doc_path", required=True, help="Path to the documentation file"
