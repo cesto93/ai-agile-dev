@@ -1,11 +1,6 @@
 import argparse
 from config import load_config
-from agent import create_stories
-
-
-def list_stories():
-    # Placeholder: Implement logic to list stories from storage
-    print("Listing all user stories (not yet implemented).")
+from agent import create_stories, list_stories
 
 
 def main():

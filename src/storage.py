@@ -27,3 +27,15 @@ def save_story(story) -> None:
     db_path = os.path.join(os.path.dirname(__file__), "..", DB_FILE)
     db = TinyDB(db_path)
     db.insert({"title": story.Title, "file": filename})
+
+
+def get_story_titles() -> List[str]:
+    """
+    Returns a list of all story titles stored in the database.
+
+    Returns:
+        List[str]: List of story titles.
+    """
+    db_path = os.path.join(os.path.dirname(__file__), "..", DB_FILE)
+    db = TinyDB(db_path)
+    return [entry["title"] for entry in db.all() if "title" in entry]
