@@ -6,26 +6,26 @@ from langchain.chat_models import init_chat_model
 from storage import save_story
 
 USER_STORY_TEMPLATE = (
-    "Titolo:\n"
+    "Title:\n"
     "{title}\n\n"
-    "[Breve descrizione della funzionalità]\n"
+    "[Brief description of the functionality]\n"
     "{description}\n\n"
     "User Story:\n\n"
-    "Come {role}\n"
-    "voglio {feature}\n"
-    "in modo da {benefit}\n\n"
-    "Criteri di accettazione (Acceptance Criteria):\n"
+    "As a {role}\n"
+    "I want {feature}\n"
+    "so that {benefit}\n\n"
+    "Acceptance Criteria:\n"
     "{acceptance_criteria}\n\n"
-    "Note tecniche (facoltative):\n\n"
-    "Vincoli tecnologici: {constraints}\n\n"
+    "Technical Notes (optional):\n\n"
+    "Technological Constraints: {constraints}\n\n"
     "Performance: {performance}\n\n"
-    "Sicurezza: {security}\n\n"
-    "Dipendenze: {dependencies}\n\n"
-    "Priorità:\n\n"
+    "Security: {security}\n\n"
+    "Dependencies: {dependencies}\n\n"
+    "Priority:\n\n"
     "{priority}\n\n"
-    "Stima:\n\n"
+    "Estimate:\n\n"
     "{estimate}\n\n"
-    "Allegati / Mockup:\n\n"
+    "Attachments / Mockups:\n\n"
     "{attachments}\n"
 )
 
@@ -248,7 +248,7 @@ def refine_stories(state: State) -> State:
     return state
 
 
-def save_stories_action(state: State):
+def save_stories(state: State):
     """
     Saves the note and its metadata to the storage.
 
