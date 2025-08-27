@@ -14,13 +14,13 @@ def main():
     create_parser.add_argument(
         "--provider",
         required=True,
-        help="Provider name (e.g., openai, azure)",
+        help="Provider name (e.g., google_genai, ollama)",
         default="google_genai",
     )
     create_parser.add_argument(
         "--model",
         required=True,
-        help="Model name (e.g., gpt-4, llama2)",
+        help="Model name (e.g., gemma3, gemini-2.5-flash)",
         default="gemini-2.5-flash",
     )
     create_parser.add_argument(
