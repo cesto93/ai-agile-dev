@@ -39,3 +39,26 @@ def get_story_titles() -> List[str]:
     db_path = os.path.join(os.path.dirname(__file__), "..", DB_FILE)
     db = TinyDB(db_path)
     return [entry["title"] for entry in db.all() if "title" in entry]
+
+
+def get_story_by_title(title: str) -> str:
+    """
+    Retrieves a story by its title.
+
+    Args:
+        title (str): The title of the story.
+
+    Returns:
+        str or None: The story content if found, else None.
+    """
+    db_path = os.path.join(os.path.dirname(__file__), "..", DB_FILE)
+    db = TinyDB(db_path)
+    Story = Query()
+    result = db.search(Story.title == title)
+    if not result:
+        return None
+    stories_dir = os.path.join(os.path.dirname(__file__), "..", STORIES_DIR)
+    filepath = os.path.join(stories_dir, result[0]["file"])
+    with open(filepath, "r") as f:
+        content = f.read()
+        return content

@@ -1,6 +1,6 @@
 import argparse
 from config import load_config
-from agent import create_stories, list_stories
+from agent import create_stories, list_stories, read_story
 
 
 def main():
@@ -35,6 +35,10 @@ def main():
     # List command
     list_parser = subparsers.add_parser("list", help="List all user stories")
 
+    # Get command
+    get_parser = subparsers.add_parser("get", help="Get a user story by title")
+    get_parser.add_argument("title", help="Title of the user story to retrieve")
+
     args = parser.parse_args()
     load_config()
 
@@ -42,6 +46,8 @@ def main():
         create_stories(args.provider, args.model, args.doc_path, args.minimal)
     elif args.command == "list":
         list_stories()
+    elif args.command == "get":
+        read_story(args.title)
 
 
 if __name__ == "__main__":
