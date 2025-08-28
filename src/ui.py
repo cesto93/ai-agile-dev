@@ -1,7 +1,12 @@
 import streamlit as st
 from config import load_config
 from agent import create_stories, read_story
-from storage import remove_story_by_title, remove_all_story, get_story_titles
+from storage import (
+    get_story_by_title,
+    remove_story_by_title,
+    remove_all_story,
+    get_story_titles,
+)
 
 
 def main():
@@ -40,7 +45,8 @@ def main():
         title = st.text_input("Title of the user story to retrieve")
         if st.button("View"):
             if title:
-                read_story(title)
+                content = get_story_by_title(title)
+                st.text_area("Story Content", content, height=300)
             else:
                 st.error("Please provide a title.")
 

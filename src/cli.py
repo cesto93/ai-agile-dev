@@ -1,7 +1,12 @@
 import typer
 from config import load_config
-from agent import create_stories, list_stories, read_story
-from storage import remove_story_by_title, remove_all_story  # <-- Add remove_all_story
+from agent import create_stories
+from storage import (
+    get_story_by_title,
+    get_story_titles,
+    remove_story_by_title,
+    remove_all_story,
+)  # <-- Add remove_all_story
 
 app = typer.Typer(
     help="AI Agile Dev CLI",
@@ -32,14 +37,17 @@ def create(
 def list():
     """List all user stories."""
     load_config()
-    list_stories()
+    stories = get_story_titles()
+    for title in stories:
+        print(title)
 
 
 @app.command()
 def get(title: str = typer.Argument(..., help="Title of the user story to retrieve")):
     """Get a user story by title."""
     load_config()
-    read_story(title)
+    content = get_story_by_title(title)
+    print(content)
 
 
 @app.command()
