@@ -1,6 +1,6 @@
 import streamlit as st
 from config import load_config
-from agent import create_stories, read_story
+from agent import create_stories
 from storage import (
     get_story_by_title,
     remove_story_by_title,
@@ -13,10 +13,50 @@ def main():
     load_config()
     st.title("AI Agile Dev")
 
-    menu = ["Create Stories", "List Stories", "View Story", "Remove Story"]
-    choice = st.sidebar.selectbox("Menu", menu)
+    # Initialize session state
+    if "page" not in st.session_state:
+        st.session_state.page = "create"
+    if "selected_story" not in st.session_state:
+        st.session_state.selected_story = None
 
-    if choice == "Create Stories":
+    # --- Sidebar ---
+    st.sidebar.title("Menu")
+
+    if st.sidebar.button("Create Stories"):
+        st.session_state.page = "create"
+        st.session_state.selected_story = None
+        st.rerun()
+
+    if st.sidebar.button("Remove Stories"):
+        st.session_state.page = "remove"
+        st.session_state.selected_story = None
+        st.rerun()
+
+    st.sidebar.subheader("User Stories")
+    story_titles = get_story_titles()
+
+    if story_titles:
+        for title in story_titles:
+            if st.sidebar.button(title, key=f"view_{title}"):
+                st.session_state.selected_story = title
+                st.rerun()
+    else:
+        st.sidebar.info("No stories found.")
+
+    # --- Main Panel ---
+    if st.session_state.selected_story:
+        st.subheader("View User Story")
+        title = st.session_state.selected_story
+        content = get_story_by_title(title)
+        if content:
+            st.text_area("Story Content", content, height=300)
+        else:
+            st.error(f"Story '{title}' not found. It may have been removed.")
+            st.session_state.selected_story = None
+            st.session_state.page = "create"
+            st.rerun()
+
+    elif st.session_state.page == "create":
         st.subheader("Create User Stories")
         provider = st.text_input("Provider", "google_genai")
         model = st.text_input("Model", "gemini-1.5-flash-latest")
@@ -28,52 +68,41 @@ def main():
                 with st.spinner("Creating stories..."):
                     create_stories(provider, model, doc_path, minimal)
                 st.success("Stories created successfully.")
+                st.rerun()
             else:
                 st.error("Please provide the path to the documentation file.")
 
-    elif choice == "List Stories":
-        st.subheader("All User Stories")
-        titles = get_story_titles()
-        if titles:
-            for title in titles:
-                st.write(f"- {title}")
-        else:
-            st.info("No stories found.")
-
-    elif choice == "View Story":
-        st.subheader("View User Story")
-        title = st.text_input("Title of the user story to retrieve")
-        if st.button("View"):
-            if title:
-                content = get_story_by_title(title)
-                st.text_area("Story Content", content, height=300)
-            else:
-                st.error("Please provide a title.")
-
-    elif choice == "Remove Story":
+    elif st.session_state.page == "remove":
         st.subheader("Remove User Story")
-
         removal_choice = st.radio(
             "Choose removal option:", ("Remove by Title", "Remove All Stories")
         )
 
         if removal_choice == "Remove by Title":
-            titles = get_story_titles()
-            title_to_remove = st.selectbox("Select a story to remove:", titles)
-            if st.button("Remove Story"):
-                if title_to_remove:
-                    removed = remove_story_by_title(title_to_remove)
-                    if removed:
-                        st.success(f"Story '{title_to_remove}' removed.")
-                    else:
-                        st.error(f"Story '{title_to_remove}' not found.")
-                else:
-                    st.warning("Please select a story to remove.")
+            titles_to_remove = get_story_titles()
+            if titles_to_remove:
+                title_to_remove = st.selectbox(
+                    "Select a story to remove:", titles_to_remove
+                )
+                if st.button("Remove Story"):
+                    if title_to_remove:
+                        removed = remove_story_by_title(title_to_remove)
+                        if removed:
+                            st.success(f"Story '{title_to_remove}' removed.")
+                            if st.session_state.selected_story == title_to_remove:
+                                st.session_state.selected_story = None
+                            st.rerun()
+                        else:
+                            st.error(f"Story '{title_to_remove}' not found.")
+            else:
+                st.info("No stories to remove.")
 
         elif removal_choice == "Remove All Stories":
             if st.button("Remove All Stories"):
                 remove_all_story()
                 st.success("All stories removed.")
+                st.session_state.selected_story = None
+                st.rerun()
 
 
 if __name__ == "__main__":
