@@ -3,7 +3,11 @@ from config import load_config
 from agent import create_stories, list_stories, read_story
 from storage import remove_story_by_title, remove_all_story  # <-- Add remove_all_story
 
-app = typer.Typer(help="AI Agile Dev CLI", no_args_is_help=True)
+app = typer.Typer(
+    help="AI Agile Dev CLI",
+    no_args_is_help=True,
+    context_settings={"help_option_names": ["-h", "--help"]},
+)
 
 
 @app.command()
