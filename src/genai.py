@@ -8,12 +8,8 @@ from storage import save_story
 USER_STORY_TEMPLATE = (
     "Title:\n"
     "{title}\n\n"
-    "[Brief description of the functionality]\n"
+    "[Description of the functionality]\n"
     "{description}\n\n"
-    "User Story:\n\n"
-    "As a {role}\n"
-    "I want {feature}\n"
-    "so that {benefit}\n\n"
     "Acceptance Criteria:\n"
     "{acceptance_criteria}\n\n"
     "Dependencies: {dependencies}\n\n"
@@ -54,18 +50,6 @@ class UserStory(BaseModel):
         ...,
         description="A brief description of the functionality.",
     )
-    Role: str = Field(
-        ...,
-        description="The user role (e.g., 'utente', 'admin').",
-    )
-    Feature: str = Field(
-        ...,
-        description="The feature the user wants.",
-    )
-    Benefit: str = Field(
-        ...,
-        description="The benefit the user gets.",
-    )
     AcceptanceCriteria: str = Field(
         ...,
         description="Acceptance criteria for the user story.",
@@ -84,9 +68,6 @@ class UserStory(BaseModel):
         return USER_STORY_TEMPLATE.format(
             title=self.Title,
             description=self.Description,
-            role=self.Role,
-            feature=self.Feature,
-            benefit=self.Benefit,
             acceptance_criteria=self.AcceptanceCriteria,
             dependencies=self.Dependencies,
             priority=self.Priority,
