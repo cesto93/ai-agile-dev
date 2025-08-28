@@ -16,17 +16,8 @@ USER_STORY_TEMPLATE = (
     "so that {benefit}\n\n"
     "Acceptance Criteria:\n"
     "{acceptance_criteria}\n\n"
-    "Technical Notes (optional):\n\n"
-    "Technological Constraints: {constraints}\n\n"
-    "Performance: {performance}\n\n"
-    "Security: {security}\n\n"
     "Dependencies: {dependencies}\n\n"
-    "Priority:\n\n"
-    "{priority}\n\n"
-    "Estimate:\n\n"
-    "{estimate}\n\n"
-    "Attachments / Mockups:\n\n"
-    "{attachments}\n"
+    "Priority: {priority}\n\n"
 )
 
 
@@ -79,18 +70,6 @@ class UserStory(BaseModel):
         ...,
         description="Acceptance criteria for the user story.",
     )
-    Constraints: str = Field(
-        default="",
-        description="Technological constraints.",
-    )
-    Performance: str = Field(
-        default="",
-        description="Performance requirements.",
-    )
-    Security: str = Field(
-        default="",
-        description="Security requirements.",
-    )
     Dependencies: str = Field(
         default="",
         description="Dependencies.",
@@ -98,14 +77,6 @@ class UserStory(BaseModel):
     Priority: str = Field(
         default="",
         description="Priority.",
-    )
-    Estimate: str = Field(
-        default="",
-        description="Estimate.",
-    )
-    Attachments: str = Field(
-        default="",
-        description="Attachments or mockups.",
     )
 
     def to_template_string(self) -> str:
@@ -117,13 +88,8 @@ class UserStory(BaseModel):
             feature=self.Feature,
             benefit=self.Benefit,
             acceptance_criteria=self.AcceptanceCriteria,
-            constraints=self.Constraints,
-            performance=self.Performance,
-            security=self.Security,
             dependencies=self.Dependencies,
             priority=self.Priority,
-            estimate=self.Estimate,
-            attachments=self.Attachments,
         )
 
 
