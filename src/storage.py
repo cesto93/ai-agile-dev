@@ -90,3 +90,21 @@ def remove_story_by_title(title: str) -> bool:
     # Remove the entry from the database
     db.remove(Story.title == title)
     return True
+
+
+def remove_all_story() -> None:
+    """
+    Removes all stories from the markdown files and clears the database.
+    """
+    # Remove all markdown files in the stories directory
+    stories_dir = os.path.join(os.path.dirname(__file__), "..", STORIES_DIR)
+    if os.path.exists(stories_dir):
+        for filename in os.listdir(stories_dir):
+            file_path = os.path.join(stories_dir, filename)
+            if os.path.isfile(file_path) and filename.endswith(".md"):
+                os.remove(file_path)
+
+    # Clear the database
+    db_path = os.path.join(os.path.dirname(__file__), "..", DB_FILE)
+    db = TinyDB(db_path)
+    db.truncate()
