@@ -62,3 +62,31 @@ def get_story_by_title(title: str) -> str:
     with open(filepath, "r") as f:
         content = f.read()
         return content
+
+
+def remove_story_by_title(title: str) -> bool:
+    """
+    Removes a story by its title, deleting both the markdown file and the database entry.
+
+    Args:
+        title (str): The title of the story to remove.
+
+    Returns:
+        bool: True if the story was found and removed, False otherwise.
+    """
+    db_path = os.path.join(os.path.dirname(__file__), "..", DB_FILE)
+    db = TinyDB(db_path)
+    Story = Query()
+    result = db.search(Story.title == title)
+    if not result:
+        return False
+
+    # Remove the markdown file
+    stories_dir = os.path.join(os.path.dirname(__file__), "..", STORIES_DIR)
+    filepath = os.path.join(stories_dir, result[0]["file"])
+    if os.path.exists(filepath):
+        os.remove(filepath)
+
+    # Remove the entry from the database
+    db.remove(Story.title == title)
+    return True

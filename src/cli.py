@@ -1,6 +1,7 @@
 import typer
 from config import load_config
 from agent import create_stories, list_stories, read_story
+from storage import remove_story_by_title  # <-- Add this import
 
 app = typer.Typer(help="AI Agile Dev CLI")
 
@@ -35,6 +36,17 @@ def get(title: str = typer.Argument(..., help="Title of the user story to retrie
     """Get a user story by title."""
     load_config()
     read_story(title)
+
+
+@app.command()
+def rm(title: str = typer.Argument(..., help="Title of the user story to remove")):
+    """Remove a user story by title."""
+    load_config()
+    removed = remove_story_by_title(title)
+    if removed:
+        typer.echo(f"Story '{title}' removed.")
+    else:
+        typer.echo(f"Story '{title}' not found.")
 
 
 if __name__ == "__main__":
