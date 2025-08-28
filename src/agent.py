@@ -12,12 +12,6 @@ def create_stories(provider: str, model: str, doc_path: str, minimal: bool) -> N
             save_story(story)
 
 
-def list_stories() -> None:
-    stories = get_story_titles()
-    for title in stories:
-        print(title)
-
-
 def read_story(title: str) -> None:
     content = get_story_by_title(title)
     print(content)
