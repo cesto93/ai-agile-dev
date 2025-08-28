@@ -48,7 +48,7 @@ def main():
         title = st.session_state.selected_story
         content = get_story_by_title(title)
         if content:
-            st.text_area("Story Content", content, height=450)
+            st.text_area("", content, height=450)
         else:
             st.error(f"Story '{title}' not found. It may have been removed.")
             st.session_state.selected_story = None
