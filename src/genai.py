@@ -6,13 +6,13 @@ from langchain.chat_models import init_chat_model
 from storage import save_story
 
 USER_STORY_TEMPLATE = (
-    "Title: {title}\n\n"
-    "[Description]\n"
+    "# Title: {title}\n\n"
+    "# Description\n"
     "{description}\n\n"
-    "Acceptance Criteria:\n"
+    "# Acceptance Criteria:\n"
     "{acceptance_criteria}\n\n"
     "Dependencies: {dependencies}\n\n"
-    "Priority: {priority}\n"
+    "Priority: {priority}"
 )
 
 

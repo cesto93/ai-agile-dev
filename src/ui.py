@@ -45,11 +45,10 @@ def main():
 
     # --- Main Panel ---
     if st.session_state.selected_story:
-        st.subheader("View User Story")
         title = st.session_state.selected_story
         content = get_story_by_title(title)
         if content:
-            st.text_area("Story Content", content, height=300)
+            st.text_area("Story Content", content, height=450)
         else:
             st.error(f"Story '{title}' not found. It may have been removed.")
             st.session_state.selected_story = None
@@ -59,7 +58,7 @@ def main():
     elif st.session_state.page == "create":
         st.subheader("Create User Stories")
         provider = st.text_input("Provider", "google_genai")
-        model = st.text_input("Model", "gemini-1.5-flash-latest")
+        model = st.text_input("Model", "gemini-2.5-flash-lite")
         doc_path = st.text_input("Path to documentation file")
         minimal = st.checkbox("Only extract minimal user story names without details")
 
