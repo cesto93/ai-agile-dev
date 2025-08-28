@@ -16,7 +16,7 @@ def create(
         "google_genai", help="Provider name (e.g., google_genai, ollama)"
     ),
     model: str = typer.Option(
-        "gemini-2.5-flash", help="Model name (e.g., gemma3, gemini-2.5-flash)"
+        "gemini-2.5-flash-lite", help="Model name (e.g., gemma3, gemini-2.5-flash)"
     ),
     doc_path: str = typer.Option(..., help="Path to the documentation file"),
     minimal: bool = typer.Option(
