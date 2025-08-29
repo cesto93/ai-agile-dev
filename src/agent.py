@@ -11,8 +11,3 @@ def create_stories(provider: str, model: str, problem_text: str, minimal: bool) 
         state = refine_stories(state)
         for story in state["stories"]:
             save_story(story)
-
-
-def read_story(title: str) -> None:
-    content = get_story_by_title(title)
-    logging.info(content)
