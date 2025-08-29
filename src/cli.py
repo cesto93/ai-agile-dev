@@ -30,7 +30,9 @@ def create(
 ):
     """Create user stories from documentation."""
     load_config()
-    create_stories(provider, model, doc_path, minimal)
+    with open(doc_path, "r", encoding="utf-8") as f:
+        problem_text = f.read()
+    create_stories(provider, model, problem_text, minimal)
 
 
 @app.command()

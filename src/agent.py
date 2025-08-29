@@ -3,8 +3,8 @@ from storage import get_story_by_title, save_story
 from storage import get_story_titles
 
 
-def create_stories(provider: str, model: str, doc_path: str, minimal: bool) -> None:
-    state = get_initial_state(provider, model, doc_path)
+def create_stories(provider: str, model: str, problem_text: str, minimal: bool) -> None:
+    state = get_initial_state(provider, model, problem_text)
     state = get_stories_minimal(state)
     if not minimal:
         state = refine_stories(state)

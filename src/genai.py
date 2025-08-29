@@ -80,21 +80,19 @@ class State(TypedDict):
     llm: BaseChatModel
 
 
-def get_initial_state(provider: str, model: str, doc_path: str) -> State:
+def get_initial_state(provider: str, model: str, problem_text: str) -> State:
     """
     Returns the initial state for the agent.
 
     Args:
         provider (str): The provider for the language model.
         model (str): The model to use.
-        docPath (str): The path to the document to read.
+        problem_text (str): The text of the problem description.
 
     Returns:
         State: The initial state containing the document and llm.
     """
     llm = init_chat_model(f"{provider}:{model}")
-    with open(doc_path, "r", encoding="utf-8") as f:
-        problem_text = f.read()
     return {
         "problem_text": problem_text,
         "stories_minimal": [],

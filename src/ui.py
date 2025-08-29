@@ -59,17 +59,20 @@ def main():
         st.subheader("Create User Stories")
         provider = st.text_input("Provider", "google_genai")
         model = st.text_input("Model", "gemini-2.5-flash-lite")
-        doc_path = st.text_input("Path to documentation file")
+        uploaded_file = st.file_uploader(
+            "Upload documentation file", type=["md", "txt"]
+        )
         minimal = st.checkbox("Only extract minimal user story names without details")
 
         if st.button("Create"):
-            if doc_path:
+            if uploaded_file:
+                doc_content = uploaded_file.getvalue().decode("utf-8")
                 with st.spinner("Creating stories..."):
-                    create_stories(provider, model, doc_path, minimal)
+                    create_stories(provider, model, doc_content, minimal)
                 st.success("Stories created successfully.")
                 st.rerun()
             else:
-                st.error("Please provide the path to the documentation file.")
+                st.error("Please upload a documentation file.")
 
     elif st.session_state.page == "remove":
         st.subheader("Remove User Story")
