@@ -29,9 +29,38 @@ def main():
         st.session_state.is_renaming = False
     if "selected_story" not in st.session_state:
         st.session_state.selected_story = None
+    if "provider" not in st.session_state:
+        st.session_state.provider = ModelProvider.GOOGLE_GENAI.value
+    if "model" not in st.session_state:
+        st.session_state.model = GoogleGenAIModel.GEMINI_2_5_FLASH_LITE.value
 
     # --- Sidebar ---
     st.sidebar.title("Menu")
+
+    with st.sidebar.expander("Configuration"):
+
+        def on_provider_change():
+            provider = st.session_state.provider
+            if provider == ModelProvider.GOOGLE_GENAI.value:
+                st.session_state.model = GoogleGenAIModel.GEMINI_2_5_FLASH_LITE.value
+            elif provider == ModelProvider.OLLAMA.value:
+                st.session_state.model = OllamaModel.GEMMA_3_8B.value
+
+        provider = st.selectbox(
+            "Provider",
+            options=[p.value for p in ModelProvider],
+            key="provider",
+            on_change=on_provider_change,
+        )
+
+        if provider == ModelProvider.GOOGLE_GENAI.value:
+            model_options = [m.value for m in GoogleGenAIModel]
+        elif provider == ModelProvider.OLLAMA.value:
+            model_options = [m.value for m in OllamaModel]
+        else:
+            model_options = []
+
+        model = st.selectbox("Model", options=model_options, key="model")
 
     if st.sidebar.button("Create Stories"):
         st.session_state.page = "create"
@@ -129,27 +158,21 @@ def main():
 
     elif st.session_state.page == "create":
         st.subheader("Create User Stories")
-        provider = st.selectbox("Provider", options=[p.value for p in ModelProvider])
-
-        if provider == ModelProvider.GOOGLE_GENAI.value:
-            model_options = [m.value for m in GoogleGenAIModel]
-        elif provider == ModelProvider.OLLAMA.value:
-            model_options = [m.value for m in OllamaModel]
-        else:
-            model_options = []
-
-        model = st.selectbox("Model", options=model_options)
-
         uploaded_file = st.file_uploader(
             "Upload documentation file", type=["md", "txt"]
         )
         minimal = st.checkbox("Only extract minimal user story names without details")
 
         if st.button("Create"):
-            if uploaded_file and model:
+            if uploaded_file and st.session_state.model:
                 doc_content = uploaded_file.getvalue().decode("utf-8")
                 with st.spinner("Creating stories..."):
-                    create_stories(provider, model, doc_content, minimal)
+                    create_stories(
+                        st.session_state.provider,
+                        st.session_state.model,
+                        doc_content,
+                        minimal,
+                    )
                 st.success("Stories created successfully.")
                 st.rerun()
             elif not uploaded_file:
