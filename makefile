@@ -12,3 +12,5 @@ start:
 	docker compose up -d
 stop:
 	docker compose down
+requirements:
+	uv pip compile pyproject.toml -o requirements.txt
