@@ -16,6 +16,8 @@ def main():
     # Initialize session state
     if "page" not in st.session_state:
         st.session_state.page = "create"
+    if "is_editing" not in st.session_state:
+        st.session_state.is_editing = False
     if "selected_story" not in st.session_state:
         st.session_state.selected_story = None
 
@@ -24,11 +26,13 @@ def main():
 
     if st.sidebar.button("Create Stories"):
         st.session_state.page = "create"
+        st.session_state.is_editing = False
         st.session_state.selected_story = None
         st.rerun()
 
     if st.sidebar.button("Remove Stories"):
         st.session_state.page = "remove"
+        st.session_state.is_editing = False
         st.session_state.selected_story = None
         st.rerun()
 
@@ -38,6 +42,9 @@ def main():
     if story_titles:
         for title in story_titles:
             if st.sidebar.button(title, key=f"view_{title}"):
+                st.session_state.is_editing = (
+                    False  # Reset edit mode when selecting a new story
+                )
                 st.session_state.selected_story = title
                 st.rerun()
     else:
@@ -47,13 +54,31 @@ def main():
     if st.session_state.selected_story:
         title = st.session_state.selected_story
         content = get_story_by_title(title)
-        if content:
-            st.text_area("", content, height=450)
-            if st.button("Remove this story", key=f"rm_{title}"):
-                remove_story_by_title(title)
-                st.success(f"Story '{title}' removed.")
-                st.session_state.selected_story = None
-                st.rerun()
+        if content:  # Check if content is not None
+            if st.session_state.is_editing:
+                edited_content = st.text_area("Edit Story", content, height=450)
+                col1, col2 = st.columns([1, 5])
+                with col1:
+                    if st.button("Save Changes", key=f"save_{title}"):
+                        st.warning("Saving edited content is not yet implemented.")
+                        # Here you would typically call a save function, e.g., save_story(title, edited_content)
+                with col2:
+                    if st.button("View Mode", key=f"view_mode_{title}"):
+                        st.session_state.is_editing = False
+                        st.rerun()
+            else:
+                st.markdown(content)
+                col1, col2 = st.columns([1, 5])
+                with col1:
+                    if st.button("Edit", key=f"edit_{title}"):
+                        st.session_state.is_editing = True
+                        st.rerun()
+                with col2:
+                    if st.button("Remove this story", key=f"rm_{title}"):
+                        remove_story_by_title(title)
+                        st.success(f"Story '{title}' removed.")
+                        st.session_state.selected_story = None
+                        st.rerun()
         else:
             st.error(f"Story '{title}' not found. It may have been removed.")
             st.session_state.selected_story = None
