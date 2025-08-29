@@ -1,4 +1,3 @@
-import logging
 from genai import get_initial_state, get_stories_minimal, refine_stories
 from storage import get_story_by_title, save_story
 from storage import get_story_titles
