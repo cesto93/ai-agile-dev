@@ -4,7 +4,6 @@ from pydantic import BaseModel, Field
 from langchain_core.prompts import ChatPromptTemplate
 from langchain_core.language_models.chat_models import BaseChatModel
 from langchain.chat_models import init_chat_model
-from storage import save_story
 
 USER_STORY_TEMPLATE = (
     "# {title}\n\n"
@@ -187,16 +186,3 @@ def refine_stories(state: State) -> State:
 
     state["stories"] = detailed_stories
     return state
-
-
-def save_stories(state: State):
-    """
-    Saves the note and its metadata to the storage.
-
-    Args:
-        state (State): The state containing the note and metadata.
-    """
-
-    stories = state["stories"]
-    for story in stories:
-        save_story(story)
