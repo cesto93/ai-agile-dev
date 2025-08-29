@@ -1,9 +1,7 @@
 import logging
-from typing import TypedDict
 from pydantic import BaseModel, Field
 from langchain_core.prompts import ChatPromptTemplate
 from langchain_core.language_models.chat_models import BaseChatModel
-from langchain.chat_models import init_chat_model
 
 USER_STORY_TEMPLATE = (
     "# {title}\n\n"
@@ -69,35 +67,9 @@ class UserStory(BaseModel):
         )
 
 
-class State(TypedDict):
-    problem_text: str
-    stories_minimal: list[UserStoryMinimal]
-    stories: list[UserStory]
-    llm: BaseChatModel
-
-
-def get_initial_state(provider: str, model: str, problem_text: str) -> State:
-    """
-    Returns the initial state for the agent.
-
-    Args:
-        provider (str): The provider for the language model.
-        model (str): The model to use.
-        problem_text (str): The text of the problem description.
-
-    Returns:
-        State: The initial state containing the document and llm.
-    """
-    llm = init_chat_model(f"{provider}:{model}")
-    return {
-        "problem_text": problem_text,
-        "stories_minimal": [],
-        "stories": [],
-        "llm": llm,
-    }
-
-
-def get_stories_minimal(state: State) -> State:
+def get_stories_minimal(
+    llm: BaseChatModel, problem_desc: str
+) -> list[UserStoryMinimal]:
     """
     Analyzes the problem description and extracts a list of user story names.
 
@@ -107,7 +79,6 @@ def get_stories_minimal(state: State) -> State:
     Returns:
         dict: Updated state with 'stories_name' as a list of story titles.
     """
-    problem_desc = state["problem_text"]
     prompt_template = ChatPromptTemplate.from_messages(
         [
             (
@@ -120,22 +91,23 @@ def get_stories_minimal(state: State) -> State:
         ]
     )
 
-    llm = state["llm"]
     structured_llm = llm.with_structured_output(UserStoriesMinimal)
     prompt = prompt_template.invoke({"problem_desc": problem_desc})
     # We expect the LLM to return a Python list of strings
     result = structured_llm.invoke(prompt)
-    state["stories_minimal"] = result.Stories
+    stories = result.Stories
 
-    for story in state["stories_minimal"]:
+    for story in stories:
         logging.debug(story.Title)
         logging.debug(story.Description)
         logging.debug("-----")
 
-    return state
+    return stories
 
 
-def refine_stories(state: State) -> State:
+def refine_stories(
+    llm: BaseChatModel, stories_minimal: list[UserStoryMinimal]
+) -> list[UserStory]:
     """
     Refines each user story by adding detailed information.
 
@@ -145,11 +117,10 @@ def refine_stories(state: State) -> State:
     Returns:
         State: Updated state with detailed user stories.
     """
-    llm = state["llm"]
     structured_llm = llm.with_structured_output(UserStory)
 
     detailed_stories = []
-    for story in state["stories_minimal"]:
+    for story in stories_minimal:
         prompt_template = ChatPromptTemplate.from_messages(
             [
                 (
@@ -184,5 +155,4 @@ def refine_stories(state: State) -> State:
         detailed_story = structured_llm.invoke(prompt)
         detailed_stories.append(detailed_story)
 
-    state["stories"] = detailed_stories
-    return state
+    return detailed_stories
