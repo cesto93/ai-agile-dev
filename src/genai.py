@@ -115,7 +115,7 @@ def get_stories_minimal(state: State) -> State:
                 "system",
                 "You are an expert agile analyst. "
                 "Given the following problem description, extract a list of possible user stories. "
-                "Return ONLY a Python list of short user story titles (as strings), nothing else.",
+                "Return Python list of short user story titles and brief descriptions",
             ),
             ("human", "{problem_desc}"),
         ]
