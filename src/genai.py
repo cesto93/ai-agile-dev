@@ -67,6 +67,45 @@ class UserStory(BaseModel):
         )
 
 
+def clean_problem_description(llm: BaseChatModel, problem_desc: str) -> str:
+    """
+    Cleans the problem description by removing irrelevant information.
+
+    Args:
+        llm (BaseChatModel): The language model to use for cleaning.
+        problem_desc (str): The original problem description.
+
+    Returns:
+        str: The cleaned problem description.
+    """
+    prompt_template = ChatPromptTemplate.from_messages(
+        [
+            (
+                "system",
+                "You are an expert agile analyst."
+                "Given the following problem description, return the text ommitting information not relevant to the use case"
+                "Do not change any other word, only delete irrelevant information.",
+            ),
+            ("human", "{problem_desc}"),
+        ]
+    )
+
+    prompt = prompt_template.invoke({"problem_desc": problem_desc})
+    result = llm.invoke(prompt)
+    text = result.content
+
+    # Ensure the result is always a string
+    if isinstance(text, list):
+        text = "\n".join(str(item) for item in text)
+
+    logging.debug("Original Problem Description:")
+    logging.debug(problem_desc)
+    logging.debug("Cleaned Problem Description:")
+    logging.debug(text)
+
+    return text
+
+
 def get_stories_minimal(
     llm: BaseChatModel, problem_desc: str
 ) -> list[UserStoryMinimal]:
