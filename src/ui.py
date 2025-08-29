@@ -1,4 +1,5 @@
 import streamlit as st
+import logging
 from src.config import (
     GoogleGenAIModel,
     ModelProvider,
@@ -30,6 +31,8 @@ def initialize_session_state():
         st.session_state.provider = ModelProvider.GOOGLE_GENAI.value
     if "model" not in st.session_state:
         st.session_state.model = GoogleGenAIModel.GEMINI_2_5_FLASH_LITE.value
+    if "log_level" not in st.session_state:
+        st.session_state.log_level = "INFO"
 
 
 def reset_page_states(page=None):
@@ -51,6 +54,10 @@ def render_configuration():
         elif provider == ModelProvider.OLLAMA.value:
             st.session_state.model = OllamaModel.GEMMA_3_8B.value
 
+    def on_log_level_change():
+        log_level = st.session_state.log_level
+        logging.getLogger().setLevel(log_level)
+
     provider = st.selectbox(
         "Provider",
         options=[p.value for p in ModelProvider],
@@ -66,6 +73,13 @@ def render_configuration():
         model_options = []
 
     st.selectbox("Model", options=model_options, key="model")
+
+    st.selectbox(
+        "Log Level",
+        options=["DEBUG", "INFO", "WARNING", "ERROR", "CRITICAL"],
+        key="log_level",
+        on_change=on_log_level_change,
+    )
 
 
 def render_sidebar():
@@ -230,6 +244,9 @@ def main():
     st.title("AI Agile Dev")
 
     initialize_session_state()
+    # Set initial log level from session state
+    logging.getLogger().setLevel(st.session_state.log_level)
+
     render_sidebar()
     render_main_panel()
 
