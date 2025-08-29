@@ -1,6 +1,5 @@
 from genai import get_initial_state, get_stories_minimal, refine_stories
-from storage import get_story_by_title, save_story
-from storage import get_story_titles
+from storage import save_story
 
 
 def create_stories(provider: str, model: str, problem_text: str, minimal: bool) -> None:
