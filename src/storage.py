@@ -29,6 +29,38 @@ def save_story(story) -> None:
     db.insert({"title": story.Title, "file": filename})
 
 
+def save_problem_description(description: str) -> None:
+    """
+    Saves or updates the original problem description in the database.
+
+    Args:
+        description (str): The problem description text.
+    """
+    db_path = os.path.join(os.path.dirname(__file__), "..", DB_FILE)
+    db = TinyDB(db_path)
+    Problem = Query()
+    db.upsert(
+        {"type": "problem_description", "content": description},
+        Problem.type == "problem_description",
+    )
+
+
+def get_problem_description() -> str | None:
+    """
+    Retrieves the original problem description from the database.
+
+    Returns:
+        str or None: The problem description if found, else None.
+    """
+    db_path = os.path.join(os.path.dirname(__file__), "..", DB_FILE)
+    db = TinyDB(db_path)
+    Problem = Query()
+    result = db.search(Problem.type == "problem_description")
+    if result:
+        return result[0]["content"]
+    return None
+
+
 def get_story_titles() -> List[str]:
     """
     Returns a list of all story titles stored in the database.

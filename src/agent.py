@@ -4,6 +4,7 @@ from langchain.chat_models import init_chat_model
 from src.genai import (
     UserStory,
     UserStoryMinimal,
+    clean_problem_description,
     get_stories_minimal,
     refine_stories,
 )
@@ -11,6 +12,7 @@ from src.storage import save_story
 
 
 class State(TypedDict):
+    orig_problem_text: str
     problem_text: str
     stories_minimal: list[UserStoryMinimal]
     stories: list[UserStory]
@@ -31,7 +33,8 @@ def get_initial_state(provider: str, model: str, problem_text: str) -> State:
     """
     llm = init_chat_model(f"{provider}:{model}")
     return {
-        "problem_text": problem_text,
+        "orig_problem_text": problem_text,
+        "problem_text": "",
         "stories_minimal": [],
         "stories": [],
         "llm": llm,
@@ -40,6 +43,9 @@ def get_initial_state(provider: str, model: str, problem_text: str) -> State:
 
 def create_stories(provider: str, model: str, problem_text: str, minimal: bool) -> None:
     state = get_initial_state(provider, model, problem_text)
+    state["problem_text"] = clean_problem_description(
+        state["llm"], state["orig_problem_text"]
+    )
     stories_minimal = get_stories_minimal(state["llm"], state["problem_text"])
     state["stories_minimal"] = stories_minimal
     if not minimal:
