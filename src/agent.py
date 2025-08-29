@@ -8,7 +8,7 @@ from src.genai import (
     get_stories_minimal,
     refine_stories,
 )
-from src.storage import save_story
+from src.storage import save_story, save_problem_description
 
 
 class State(TypedDict):
@@ -46,6 +46,7 @@ def create_stories(provider: str, model: str, problem_text: str, minimal: bool) 
     state["problem_text"] = clean_problem_description(
         state["llm"], state["orig_problem_text"]
     )
+    save_problem_description(state["problem_text"])
     stories_minimal = get_stories_minimal(state["llm"], state["problem_text"])
     state["stories_minimal"] = stories_minimal
     if not minimal:
