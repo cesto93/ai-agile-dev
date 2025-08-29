@@ -136,3 +136,34 @@ def edit_story(title: str, new_content: str) -> bool:
             f.write(new_content)
         return True
     return False
+
+
+def rename_story(old_title: str, new_title: str) -> bool:
+    """
+    Renames an existing story by updating its title in the database and renaming the markdown file.
+
+    Args:
+        old_title (str): The current title of the story.
+        new_title (str): The new title to assign to the story.
+
+    Returns:
+        bool: True if the story was found and renamed, False otherwise.
+    """
+    db_path = os.path.join(os.path.dirname(__file__), "..", DB_FILE)
+    db = TinyDB(db_path)
+    Story = Query()
+    result = db.search(Story.title == old_title)
+    if not result:
+        return False
+
+    # Rename the markdown file
+    stories_dir = os.path.join(os.path.dirname(__file__), "..", STORIES_DIR)
+    old_filepath = os.path.join(stories_dir, result[0]["file"])
+    new_filename = f"{new_title.replace(' ', '_')}.md"
+    new_filepath = os.path.join(stories_dir, new_filename)
+    if os.path.exists(old_filepath):
+        os.rename(old_filepath, new_filepath)
+
+    # Update the entry in the database
+    db.update({"title": new_title, "file": new_filename}, Story.title == old_title)
+    return True
