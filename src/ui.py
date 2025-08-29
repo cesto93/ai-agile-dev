@@ -2,6 +2,7 @@ import streamlit as st
 from config import load_config
 from agent import create_stories
 from storage import (
+    edit_story,
     get_story_by_title,
     remove_story_by_title,
     remove_all_story,
@@ -60,8 +61,10 @@ def main():
                 col1, col2 = st.columns([1, 5])
                 with col1:
                     if st.button("Save Changes", key=f"save_{title}"):
-                        st.warning("Saving edited content is not yet implemented.")
-                        # Here you would typically call a save function, e.g., save_story(title, edited_content)
+                        edit_story(title, edited_content)
+                        st.success(f"Story '{title}' edited.")
+                        st.session_state.is_editing = False
+                        st.rerun()
                 with col2:
                     if st.button("View Mode", key=f"view_mode_{title}"):
                         st.session_state.is_editing = False

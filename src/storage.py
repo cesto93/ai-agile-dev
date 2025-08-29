@@ -108,3 +108,31 @@ def remove_all_story() -> None:
     db_path = os.path.join(os.path.dirname(__file__), "..", DB_FILE)
     db = TinyDB(db_path)
     db.truncate()
+
+
+def edit_story(title: str, new_content: str) -> bool:
+    """
+    Edits an existing story by its title, updating the markdown file content.
+
+    Args:
+        title (str): The title of the story to edit.
+        new_content (str): The new content to write to the story file.
+
+    Returns:
+        bool: True if the story was found and edited, False otherwise.
+    """
+    db_path = os.path.join(os.path.dirname(__file__), "..", DB_FILE)
+    db = TinyDB(db_path)
+    Story = Query()
+    result = db.search(Story.title == title)
+    if not result:
+        return False
+
+    # Update the markdown file
+    stories_dir = os.path.join(os.path.dirname(__file__), "..", STORIES_DIR)
+    filepath = os.path.join(stories_dir, result[0]["file"])
+    if os.path.exists(filepath):
+        with open(filepath, "w", encoding="utf-8") as f:
+            f.write(new_content)
+        return True
+    return False
