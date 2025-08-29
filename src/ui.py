@@ -49,6 +49,11 @@ def main():
         content = get_story_by_title(title)
         if content:
             st.text_area("", content, height=450)
+            if st.button("Remove this story", key=f"rm_{title}"):
+                remove_story_by_title(title)
+                st.success(f"Story '{title}' removed.")
+                st.session_state.selected_story = None
+                st.rerun()
         else:
             st.error(f"Story '{title}' not found. It may have been removed.")
             st.session_state.selected_story = None
@@ -75,36 +80,12 @@ def main():
                 st.error("Please upload a documentation file.")
 
     elif st.session_state.page == "remove":
-        st.subheader("Remove User Story")
-        removal_choice = st.radio(
-            "Choose removal option:", ("Remove by Title", "Remove All Stories")
-        )
-
-        if removal_choice == "Remove by Title":
-            titles_to_remove = get_story_titles()
-            if titles_to_remove:
-                title_to_remove = st.selectbox(
-                    "Select a story to remove:", titles_to_remove
-                )
-                if st.button("Remove Story"):
-                    if title_to_remove:
-                        removed = remove_story_by_title(title_to_remove)
-                        if removed:
-                            st.success(f"Story '{title_to_remove}' removed.")
-                            if st.session_state.selected_story == title_to_remove:
-                                st.session_state.selected_story = None
-                            st.rerun()
-                        else:
-                            st.error(f"Story '{title_to_remove}' not found.")
-            else:
-                st.info("No stories to remove.")
-
-        elif removal_choice == "Remove All Stories":
-            if st.button("Remove All Stories"):
-                remove_all_story()
-                st.success("All stories removed.")
-                st.session_state.selected_story = None
-                st.rerun()
+        st.subheader("Remove All Stories")
+        if st.button("Remove All Stories"):
+            remove_all_story()
+            st.success("All stories removed.")
+            st.session_state.selected_story = None
+            st.rerun()
 
 
 if __name__ == "__main__":
