@@ -1,12 +1,12 @@
 import streamlit as st
-from config import (
+from src.config import (
     GoogleGenAIModel,
     ModelProvider,
     OllamaModel,
     load_config,
 )
-from agent import create_stories
-from storage import (
+from src.agent import create_stories
+from src.storage import (
     edit_story,
     get_story_by_title,
     remove_story_by_title,

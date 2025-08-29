@@ -1,8 +1,8 @@
 import typer
 import logging
-from config import load_config
-from agent import create_stories
-from storage import (
+from src.config import load_config
+from src.agent import create_stories
+from src.storage import (
     get_story_by_title,
     get_story_titles,
     remove_story_by_title,

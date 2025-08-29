@@ -41,7 +41,7 @@ def get_story_titles() -> List[str]:
     return [entry["title"] for entry in db.all() if "title" in entry]
 
 
-def get_story_by_title(title: str) -> str:
+def get_story_by_title(title: str) -> str | None:
     """
     Retrieves a story by its title.
 

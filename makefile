@@ -5,7 +5,7 @@ venv:
 format:
 	ruff format
 ui:
-	uv run streamlit run src/ui.py
+	uv run python -m streamlit run src/ui.py
 docker-build:
 	docker build -t ai-agile-dev .
 start:

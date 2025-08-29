@@ -1,6 +1,6 @@
-from dotenv import load_dotenv
 import logging
 from enum import Enum
+from dotenv import load_dotenv
 
 
 class ModelProvider(str, Enum):
