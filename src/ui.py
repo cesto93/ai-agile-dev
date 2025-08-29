@@ -1,5 +1,10 @@
 import streamlit as st
-from config import load_config
+from config import (
+    GoogleGenAIModel,
+    ModelProvider,
+    OllamaModel,
+    load_config,
+)
 from agent import create_stories
 from storage import (
     edit_story,
@@ -124,22 +129,33 @@ def main():
 
     elif st.session_state.page == "create":
         st.subheader("Create User Stories")
-        provider = st.text_input("Provider", "google_genai")
-        model = st.text_input("Model", "gemini-2.5-flash-lite")
+        provider = st.selectbox("Provider", options=[p.value for p in ModelProvider])
+
+        if provider == ModelProvider.GOOGLE_GENAI.value:
+            model_options = [m.value for m in GoogleGenAIModel]
+        elif provider == ModelProvider.OLLAMA.value:
+            model_options = [m.value for m in OllamaModel]
+        else:
+            model_options = []
+
+        model = st.selectbox("Model", options=model_options)
+
         uploaded_file = st.file_uploader(
             "Upload documentation file", type=["md", "txt"]
         )
         minimal = st.checkbox("Only extract minimal user story names without details")
 
         if st.button("Create"):
-            if uploaded_file:
+            if uploaded_file and model:
                 doc_content = uploaded_file.getvalue().decode("utf-8")
                 with st.spinner("Creating stories..."):
                     create_stories(provider, model, doc_content, minimal)
                 st.success("Stories created successfully.")
                 st.rerun()
-            else:
+            elif not uploaded_file:
                 st.error("Please upload a documentation file.")
+            else:
+                st.error("No model available for the selected provider.")
 
     elif st.session_state.page == "remove":
         st.subheader("Remove All Stories")

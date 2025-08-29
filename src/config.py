@@ -1,5 +1,22 @@
 from dotenv import load_dotenv
 import logging
+from enum import Enum
+
+
+class ModelProvider(str, Enum):
+    GOOGLE_GENAI = "google_genai"
+    OLLAMA = "ollama"
+
+
+class GoogleGenAIModel(str, Enum):
+    GEMINI_2_5_FLASH_LITE = "gemini-2.5-flash-lite"
+    GEMINI_2_5_FLASH = "gemini-2.5-flash"
+    GEMINI_2_5_PRO = "gemini-2.5-pro"
+
+
+class OllamaModel(str, Enum):
+    GEMMA_3_8B = "gemma-3:8b"
+    QWEN_3_8B = "qwen-3:8b"
 
 
 def load_config(dotenv_path=".env"):
