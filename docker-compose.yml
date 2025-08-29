@@ -1,0 +1,9 @@
+services:
+  ai-agile-dev:
+    build: . # Build the Docker image using the Dockerfile in the current directory
+    container_name: ai-agile-dev-app # Assign a custom name to the container
+    env_file:
+      - .env
+    ports: 
+      - "8501:8501" # Host port 8501 will map to container port 8501
+    restart: unless-stopped
