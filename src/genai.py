@@ -57,10 +57,6 @@ class UserStory(BaseModel):
         default="",
         description="Dependencies.",
     )
-    Priority: str = Field(
-        default="",
-        description="Priority.",
-    )
 
     def to_template_string(self) -> str:
         """Return the user story as a formatted string using the template."""
@@ -69,7 +65,7 @@ class UserStory(BaseModel):
             description=self.Description,
             acceptance_criteria=self.AcceptanceCriteria,
             dependencies=self.Dependencies,
-            priority=self.Priority,
+            priority="",
         )
 
 
