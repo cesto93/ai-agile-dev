@@ -1,3 +1,4 @@
+import logging
 from typing import TypedDict
 from pydantic import BaseModel, Field
 from langchain_core.prompts import ChatPromptTemplate
@@ -128,9 +129,9 @@ def get_stories_minimal(state: State) -> State:
     state["stories_minimal"] = result.Stories
 
     for story in state["stories_minimal"]:
-        print(story.Title)
-        print(story.Description)
-        print("-----")
+        logging.debug(story.Title)
+        logging.debug(story.Description)
+        logging.debug("-----")
 
     return state
 

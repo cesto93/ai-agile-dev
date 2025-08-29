@@ -1,4 +1,5 @@
 from dotenv import load_dotenv
+import logging
 
 
 def load_config(dotenv_path=".env"):
@@ -15,5 +16,5 @@ def load_config(dotenv_path=".env"):
         load_dotenv(dotenv_path)
         return True
     except Exception as e:
-        print(f"Error loading .env file: {e}")
+        logging.error(f"Error loading .env file: {e}")
         return False

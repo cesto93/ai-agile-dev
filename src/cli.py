@@ -1,4 +1,5 @@
 import typer
+import logging
 from config import load_config
 from agent import create_stories
 from storage import (
@@ -6,7 +7,9 @@ from storage import (
     get_story_titles,
     remove_story_by_title,
     remove_all_story,
-)  # <-- Add remove_all_story
+)
+
+logging.basicConfig(level=logging.INFO, format="%(message)s")
 
 app = typer.Typer(
     help="AI Agile Dev CLI",
@@ -41,7 +44,7 @@ def list():
     load_config()
     stories = get_story_titles()
     for title in stories:
-        print(title)
+        logging.info(title)
 
 
 @app.command()
@@ -49,7 +52,7 @@ def get(title: str = typer.Argument(..., help="Title of the user story to retrie
     """Get a user story by title."""
     load_config()
     content = get_story_by_title(title)
-    print(content)
+    logging.info(content)
 
 
 @app.command()
@@ -69,15 +72,15 @@ def rm(
     load_config()
     if all:
         remove_all_story()
-        typer.echo("All stories removed.")
+        logging.info("All stories removed.")
     elif title:
         removed = remove_story_by_title(title)
         if removed:
-            typer.echo(f"Story '{title}' removed.")
+            logging.info(f"Story '{title}' removed.")
         else:
-            typer.echo(f"Story '{title}' not found.")
+            logging.info(f"Story '{title}' not found.")
     else:
-        typer.echo("Please provide a title or use --all to remove all stories.")
+        logging.info("Please provide a title or use --all to remove all stories.")
 
 
 if __name__ == "__main__":
