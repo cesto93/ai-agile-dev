@@ -161,11 +161,16 @@ def main():
         uploaded_file = st.file_uploader(
             "Upload documentation file", type=["md", "txt"]
         )
+
+        doc_content = ""
+        if uploaded_file:
+            doc_content = uploaded_file.getvalue().decode("utf-8")
+            st.text_area("Documentation Content", doc_content, height=300)
+
         minimal = st.checkbox("Only extract minimal user story names without details")
 
         if st.button("Create"):
             if uploaded_file and st.session_state.model:
-                doc_content = uploaded_file.getvalue().decode("utf-8")
                 with st.spinner("Creating stories..."):
                     create_stories(
                         st.session_state.provider,
